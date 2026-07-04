@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Titanic ML</title>
+  <style>
+    :root { color-scheme:dark; --navy:#07111f; --panel:#101d2d; --panel-2:#142338; --line:#263950; --cyan:#46d9d1; --blue:#6c8cff; --text:#f4f7fb; --muted:#94a7bf; --success:#46d39a; --warning:#f4ba5a; --danger:#ff7b86; }
+    * { box-sizing:border-box } body { margin:0; font:15px Inter,ui-sans-serif,system-ui,-apple-system,sans-serif; background:radial-gradient(circle at 85% 0,#142e4c 0,transparent 32%),var(--navy); color:var(--text); min-height:100vh }
+    header { padding:24px max(24px,5vw) 10px } h1 { margin:0; letter-spacing:.04em } .subtitle,.muted { color:var(--muted) }
+    nav { position:sticky; top:0; z-index:10; display:flex; gap:8px; padding:14px max(24px,5vw); overflow:auto; scrollbar-width:none; border-bottom:1px solid var(--line); background:#07111ee8; backdrop-filter:blur(14px) } nav::-webkit-scrollbar { display:none }
+    nav a { color:var(--muted); padding:9px 12px; text-decoration:none; border-radius:8px; white-space:nowrap } nav a.active,nav a:hover { background:#18314b; color:white }
+    main { width:min(1180px,92vw); margin:28px auto } .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px }
+    .card { background:rgba(17,29,46,.92); border:1px solid var(--line); border-radius:14px; padding:20px; box-shadow:0 15px 40px #0004; margin-bottom:16px }
+    .metric { font-size:2rem; color:var(--cyan); font-weight:700 } h2,h3 { margin-top:0 } label { display:block; margin:12px 0 5px; color:var(--muted) }
+    input,select,button { width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:8px; background:#0b1727; color:var(--text) }
+    button { width:auto; background:var(--cyan); color:#06121e; font-weight:700; border:0; cursor:pointer; margin-top:16px } button:disabled { opacity:.55; cursor:wait }
+    table { width:100%; border-collapse:collapse; display:block; overflow:auto } th,td { padding:10px; border-bottom:1px solid var(--line); text-align:left; white-space:nowrap } th { color:var(--muted) }
+    .form-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:0 14px } .status { padding:12px; border-left:3px solid var(--cyan); background:#0b1727; white-space:pre-wrap }
+    .error { color:var(--danger); border-left-color:var(--danger) } progress { width:100%; height:24px; accent-color:var(--cyan) } .badge { border:1px solid var(--cyan); color:var(--cyan); padding:3px 7px; border-radius:99px }
+    .dashboard-main { width:min(1240px,92vw); margin:30px auto 64px }
+    .dashboard-hero { position:relative; overflow:hidden; display:grid; grid-template-columns:1.35fr .65fr; gap:28px; align-items:center; padding:42px; margin-bottom:22px; border:1px solid #315174; border-radius:24px; background:linear-gradient(125deg,#142d49 0%,#101d2e 62%,#16384a 100%); box-shadow:0 28px 70px #0005 }
+    .dashboard-hero::after { content:""; position:absolute; inset:0; opacity:.12; pointer-events:none; background-image:linear-gradient(#80a8c733 1px,transparent 1px),linear-gradient(90deg,#80a8c733 1px,transparent 1px); background-size:32px 32px; mask-image:linear-gradient(90deg,transparent,#000) }
+    .eyebrow { color:var(--cyan); font-size:.75rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase }
+    .dashboard-hero h1 { max-width:680px; margin:9px 0 12px; font-size:clamp(2rem,4vw,3.5rem); line-height:1.06; letter-spacing:-.045em }
+    .hero-copy { max-width:650px; margin:0; color:#b8c8db; font-size:1.05rem; line-height:1.7 }
+    .hero-actions,.status-row { display:flex; flex-wrap:wrap; gap:10px; margin-top:24px }
+    .btn-link { display:inline-flex; align-items:center; justify-content:center; min-height:42px; padding:0 16px; border-radius:10px; color:#06121e; background:var(--cyan); text-decoration:none; font-weight:750; transition:.2s ease }
+    .btn-link.secondary { color:var(--text); background:#ffffff0b; border:1px solid #ffffff2e }
+    .btn-link:hover { transform:translateY(-2px); filter:brightness(1.08) }
+    .hero-status { position:relative; z-index:1; padding:22px; border:1px solid #ffffff1c; border-radius:18px; background:#06111db8 }
+    .hero-status-label { margin-bottom:14px; color:var(--muted); font-size:.78rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase }
+    .status-pill { display:flex; align-items:center; gap:9px; margin:10px 0; color:#dce8f4 }
+    .status-pill::before { content:""; width:9px; height:9px; border-radius:50%; background:var(--success); box-shadow:0 0 0 5px #46d39a18 }
+    .section-block { margin-top:32px }.section-head { display:flex; justify-content:space-between; gap:20px; align-items:end; margin-bottom:14px }.section-head h2 { margin:0; font-size:1.25rem }.section-head p { margin:4px 0 0; color:var(--muted) }
+    .kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px }
+    .kpi-card { position:relative; overflow:hidden; min-height:176px; padding:22px; border:1px solid var(--line); border-radius:18px; background:linear-gradient(145deg,#132237,#0d1827); box-shadow:0 14px 34px #0003; transition:transform .2s,border-color .2s }
+    .kpi-card:hover { border-color:#4f718f }
+    .kpi-label { margin:18px 0 4px; color:var(--muted); font-size:.8rem; font-weight:750; letter-spacing:.08em; text-transform:uppercase }.kpi-value { font-size:clamp(1.8rem,3vw,2.6rem); font-weight:800; letter-spacing:-.04em }.kpi-note { margin-top:6px; color:#8297b0; font-size:.82rem }
+    .dashboard-grid { display:grid; grid-template-columns:1.45fr .75fr; gap:16px }.dashboard-panel { min-width:0; margin:0; padding:24px; border-radius:18px; background:linear-gradient(145deg,#101d2e,#0d1826) }
+    .panel-title { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px }.panel-title h3 { margin:0 }.panel-kicker { color:var(--muted); font-size:.82rem }
+    .quality-table { display:table }.quality-table th { padding-top:0; font-size:.72rem; letter-spacing:.08em; text-transform:uppercase }.quality-table tbody tr { transition:background .15s }.quality-table tbody tr:hover { background:#ffffff07 }
+    .quality-table td { white-space:normal }.quality-track { width:110px; height:6px; overflow:hidden; border-radius:10px; background:#213248 }.quality-fill { height:100%; border-radius:inherit; background:var(--cyan) }
+    .tag { display:inline-flex; padding:4px 8px; border-radius:999px; font-size:.72rem; font-weight:750 }.tag.good { color:var(--success); background:#46d39a16 }.tag.warning { color:var(--warning); background:#f4ba5a17 }.tag.attention { color:var(--danger); background:#ff7b8617 }
+    .survival-numbers { display:grid; grid-template-columns:1fr 1fr; gap:12px }.survival-stat { padding:15px; border:1px solid var(--line); border-radius:13px; background:#ffffff05 }.survival-stat strong { display:block; margin-top:4px; font-size:1.6rem }.survival-track { display:flex; height:18px; margin:24px 0 10px; overflow:hidden; border-radius:20px; background:#24364b }.survived-bar { background:linear-gradient(90deg,var(--cyan),#6c8cff) }.lost-bar { flex:1; background:#52637a }.legend { display:flex; justify-content:space-between; color:var(--muted); font-size:.8rem }
+    .feature-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px }.feature-card { padding:17px; border:1px solid var(--line); border-radius:14px; background:#0d1928 }.feature-card h3 { margin:0 0 6px; font-size:1rem }.feature-type { color:var(--muted); font-size:.8rem }.feature-used { display:inline-flex; margin-top:13px; color:var(--success); font-size:.75rem }.feature-used::before { content:"✓"; margin-right:5px }.feature-detail { margin-top:8px; color:#c7d4e4; font-size:.82rem }
+    .workflow-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px }.workflow-step { position:relative; min-height:134px; padding:18px; border:1px solid var(--line); border-radius:14px; background:#0d1928 }.step-number { display:grid; place-items:center; width:29px; height:29px; margin-bottom:18px; border-radius:9px; background:#20344c; color:var(--cyan); font-size:.8rem; font-weight:800 }.workflow-step h3 { margin-bottom:9px; font-size:.9rem }
+    .skeleton { display:block; overflow:hidden; border-radius:7px; color:transparent!important; background:linear-gradient(90deg,#1a2a3d 25%,#283b52 45%,#1a2a3d 65%); background-size:200% 100%; animation:shimmer 1.2s infinite }.skeleton-value { width:64%; height:42px }.loading-row { height:140px }
+    body.wandb-theme { --navy:#1b1c1f; --panel:#24262b; --panel-2:#30333a; --line:#3a3c42; --cyan:#ffbf3f; --text:#f7f3e9; --muted:#aaa9a4; background:#1b1c1f }
+    .wandb-theme nav { background:#1b1c1ff2; border-color:#35373c }.wandb-theme nav a.active,.wandb-theme nav a:hover { color:#1b1c1f; background:#ffbf3f }
+    .model-main { width:min(1380px,94vw); margin:46px auto 70px }.registry-hero { display:flex; justify-content:space-between; align-items:end; gap:28px; margin-bottom:28px }.registry-eyebrow { color:#ffbf3f; font-size:.75rem; font-weight:800; letter-spacing:.17em; text-transform:uppercase }.registry-hero h1 { max-width:760px; margin:10px 0 9px; font:700 clamp(2.5rem,5vw,4.7rem)/.98 Georgia,serif; letter-spacing:-.045em }.registry-hero p { max-width:720px; margin:0; color:#b7b6b1; font-size:1.02rem; line-height:1.65 }.registry-action { display:inline-flex; align-items:center; min-height:46px; padding:0 18px; border-radius:9px; color:#1b1c1f; background:#ffbf3f; text-decoration:none; font-weight:800; white-space:nowrap }
+    .registry-summary { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:18px }.registry-stat { padding:18px 20px; border:1px solid var(--line); border-radius:12px; background:#24262b }.registry-stat span { display:block; color:var(--muted); font-size:.75rem; font-weight:750; letter-spacing:.08em; text-transform:uppercase }.registry-stat strong { display:block; margin-top:8px; font-size:1.55rem }.registry-stat.accent { border-color:#745d28; background:linear-gradient(135deg,#302a1d,#24262b) }.registry-stat.accent strong { color:#ffca57 }
+    .registry-panel { overflow:hidden; border:1px solid var(--line); border-radius:14px; background:#222429; box-shadow:0 22px 60px #0003 }.registry-panel-head { display:flex; justify-content:space-between; gap:18px; align-items:center; padding:20px 22px; border-bottom:1px solid var(--line) }.registry-panel-head h2 { margin:0; font-size:1.05rem }.registry-panel-head p { margin:4px 0 0; color:var(--muted); font-size:.82rem }.registry-count { color:#ffca57; font:700 .8rem ui-monospace,monospace }
+    .registry-table-scroll { overflow:auto }.model-table { display:table; min-width:1120px }.model-table th { padding:14px 16px; color:#8f908f; background:#1e2024; font-size:.68rem; letter-spacing:.1em; text-transform:uppercase }.model-table td { padding:17px 16px; border-color:#36383d }.model-table tbody tr { transition:background .15s }.model-table tbody tr:hover { background:#2b2d32 }.model-table tbody tr.active-run { box-shadow:inset 3px 0 #ffbf3f }.run-id { font:700 .8rem ui-monospace,SFMono-Regular,monospace; color:#f4efe3 }.run-time { margin-top:5px; color:#858680; font-size:.72rem }.algorithm-name { font-weight:750 }.algorithm-mode { margin-top:5px; color:#92938e; font-size:.72rem; text-transform:capitalize }.metric-number { font:750 .95rem ui-monospace,monospace }.metric-number.best { color:#ffca57 }.model-badge { display:inline-flex; margin:2px 4px 2px 0; padding:4px 8px; border-radius:99px; font-size:.68rem; font-weight:800 }.model-badge.active { color:#1b1c1f; background:#ffbf3f }.model-badge.champion { color:#6de0e8; background:#153b40 }.model-badge.runs { color:#c6c4bc; background:#34363b }.param-list { display:flex; flex-wrap:wrap; gap:5px; max-width:350px }.param-chip { padding:4px 7px; border-radius:5px; color:#c7c7c3; background:#303238; font:600 .68rem ui-monospace,monospace }.activate-button { margin:0; padding:8px 12px; color:#1b1c1f; background:#ffbf3f; font-size:.75rem }.activate-button:disabled { color:#8e8e89; background:#34363b }
+    @keyframes shimmer { to { background-position:-200% 0 } }
+    @media (max-width:960px) { .dashboard-hero,.dashboard-grid { grid-template-columns:1fr }.kpi-grid,.feature-grid { grid-template-columns:repeat(2,1fr) }.workflow-grid { grid-template-columns:repeat(3,1fr) } }
+    @media (max-width:620px) { nav { padding-inline:16px }.dashboard-main { width:min(100% - 28px,1240px); margin-top:16px }.dashboard-hero { padding:26px 22px; border-radius:18px }.dashboard-grid { grid-template-columns:minmax(0,1fr) }.kpi-grid,.feature-grid,.workflow-grid,.registry-summary { grid-template-columns:1fr }.section-head,.registry-hero { align-items:start; flex-direction:column }.quality-track { width:72px }.dashboard-panel { padding:18px }.quality-table { display:block; overflow-x:auto }.kpi-card { min-height:158px }.model-main { width:min(100% - 28px,1380px); margin-top:28px }.registry-panel-head { align-items:start; flex-direction:column } }
+  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='wandb-theme.css') }}">
+</head>
+<body class="wandb-theme">
+  {% include '_main_nav.html' %}
+  <main class="{{ 'dashboard-main' if page == 'dashboard' else 'model-main' if page == 'models' else '' }}">
+    <div id="message" class="status" hidden></div>
+
+    {% if page == 'dashboard' %}
+      <section class="dashboard-hero">
+        <div><div class="eyebrow">OVERVIEW</div><h1>Titanic ML</h1><p class="hero-copy">Dataset overview and model status.</p>
+          <div class="hero-actions"><a class="btn-link" href="/ml/train">Train model</a><a class="btn-link secondary" href="/ml/predict">Open prediction</a></div>
+        </div>
+        <aside class="hero-status" aria-label="平台狀態"><div class="hero-status-label">System health</div><div id="datasetBadge" class="status-pill">Checking dataset…</div><div id="serviceBadge" class="status-pill">Checking model service…</div><div id="trainingMini" class="panel-kicker">Training status: loading</div></aside>
+      </section>
+
+      <section class="section-block" aria-labelledby="kpiHeading"><div class="section-head"><div><h2 id="kpiHeading">Overview</h2><p>Current dataset and model state.</p></div><span class="panel-kicker">API data</span></div>
+        <div class="kpi-grid">
+          <article class="kpi-card"><div class="kpi-label">Total passengers</div><div id="kpiTotal" class="kpi-value skeleton skeleton-value">Loading</div><div class="kpi-note">Database rows</div></article>
+          <article class="kpi-card"><div class="kpi-label">Survival rate</div><div id="kpiSurvival" class="kpi-value skeleton skeleton-value">Loading</div><div class="kpi-note">Observed outcome</div></article>
+          <article class="kpi-card"><div class="kpi-label">Missing values</div><div id="kpiMissing" class="kpi-value skeleton skeleton-value">Loading</div><div class="kpi-note">Imputed by pipeline</div></article>
+          <article class="kpi-card"><div class="kpi-label">Active model</div><div id="kpiModel" class="kpi-value skeleton skeleton-value">Loading</div><div id="kpiModelNote" class="kpi-note">Loading registry</div></article>
+        </div>
+      </section>
+
+      <section class="section-block dashboard-grid">
+        <article class="card dashboard-panel"><div class="panel-title"><div><h3>Data quality</h3><div class="panel-kicker">Missing values by field</div></div><span id="qualitySummary" class="tag good">Loading</span></div>
+          <table class="quality-table"><thead><tr><th>Feature</th><th>Missing</th><th>Ratio</th><th>Coverage</th><th>Status</th></tr></thead><tbody id="qualityBody"><tr><td colspan="5"><span class="skeleton loading-row">Loading</span></td></tr></tbody></table>
+        </article>
+        <article class="card dashboard-panel"><div class="panel-title"><div><h3>Survival</h3><div class="panel-kicker">Outcome distribution</div></div></div>
+          <div class="survival-numbers"><div class="survival-stat"><span class="muted">Survived</span><strong id="survivedCount">—</strong></div><div class="survival-stat"><span class="muted">Not survived</span><strong id="notSurvivedCount">—</strong></div></div>
+          <div class="survival-track" aria-label="存活比例"><div id="survivalBar" class="survived-bar"></div><div class="lost-bar"></div></div><div class="legend"><span id="survivalRateText">Survived —</span><span id="lostRateText">Not survived —</span></div>
+        </article>
+      </section>
+
+      <section class="section-block"><div class="section-head"><div><h2>Model inputs</h2><p>Features used for training and prediction.</p></div><span class="tag good">7 features</span></div>
+        <div class="feature-grid">
+          {% for name, type in [('Pclass','Ordinal'),('Sex','Categorical'),('Age','Numeric'),('Fare','Numeric'),('Embarked','Categorical'),('SibSp','Numeric'),('Parch','Numeric')] %}
+          <article class="feature-card"><h3>{{ name }}</h3><div class="feature-type">{{ type }}</div><div id="feature{{ name }}" class="feature-detail">Loading profile…</div><span class="feature-used">Used in model</span></article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="section-block"><div class="section-head"><div><h2>Pipeline</h2><p>Readiness of each processing step.</p></div><span id="workflowLabel" class="panel-kicker">Checking pipeline</span></div><div id="workflow" class="workflow-grid"><span class="skeleton loading-row">Loading</span></div></section>
+    {% elif page == 'train' %}
+      <h2>Train model</h2>
+      <section class="card"><form id="trainForm"><div class="form-grid">
+        <div><label for="model">模型</label><select id="model"><option value="logistic_regression">Logistic Regression</option><option value="random_forest">Random Forest</option><option value="gradient_boosting">Gradient Boosting</option><option value="extra_trees">Extra Trees</option><option value="svm">Support Vector Machine</option></select></div>
+        <div><label for="mode">搜尋模式</label><select id="mode"><option value="quick">Quick</option><option value="balanced">Balanced</option><option value="full">Full</option></select></div>
+      </div><button id="trainButton">開始訓練</button></form></section>
+      <section class="card"><h3>訓練狀態</h3><div id="trainStatus" class="status">idle</div><div id="trainResult"></div></section>
+    {% elif page == 'models' %}
+      <section class="registry-hero"><div><div class="registry-eyebrow">MODELS</div><h1>Model registry</h1><p>Saved training runs, metrics, and parameters.</p></div><a class="registry-action" href="/ml/train">New run</a></section>
+      <section class="registry-summary"><article class="registry-stat"><span>Saved runs</span><strong id="runCount">—</strong></article><article class="registry-stat"><span>Unique configurations</span><strong id="uniqueCount">—</strong></article><article class="registry-stat accent"><span>Best test accuracy</span><strong id="bestAccuracy">—</strong></article></section>
+      <section class="registry-panel"><div class="registry-panel-head"><div><h2>Experiment runs</h2><p>Equivalent deterministic runs are grouped to keep the registry readable.</p></div><span id="registryCount" class="registry-count">Loading registry…</span></div><div class="registry-table-scroll"><table class="model-table"><thead><tr><th>Status</th><th>Run</th><th>Algorithm</th><th>Accuracy</th><th>F1</th><th>ROC-AUC</th><th>Best parameters</th><th>Action</th></tr></thead><tbody id="models"><tr><td colspan="8">Loading model runs…</td></tr></tbody></table></div></section>
+    {% elif page == 'predict' %}
+      <h2>Prediction</h2>
+      <section class="card"><form id="predictForm"><div class="form-grid">
+        <div><label for="Pclass">Pclass</label><select id="Pclass" name="Pclass"><option>1</option><option>2</option><option selected>3</option></select></div>
+        <div><label for="Sex">Sex</label><select id="Sex" name="Sex"><option>male</option><option>female</option></select></div>
+        <div><label for="Age">Age</label><input id="Age" name="Age" type="number" min="0" max="120" step="0.1" value="22" required></div>
+        <div><label for="SibSp">SibSp</label><input id="SibSp" name="SibSp" type="number" min="0" value="1" required></div>
+        <div><label for="Parch">Parch</label><input id="Parch" name="Parch" type="number" min="0" value="0" required></div>
+        <div><label for="Fare">Fare</label><input id="Fare" name="Fare" type="number" min="0" step="0.01" value="7.25" required></div>
+        <div><label for="Embarked">Embarked</label><select id="Embarked" name="Embarked"><option>C</option><option>Q</option><option selected>S</option></select></div>
+      </div><button id="predictButton">執行預測與 What-if</button></form></section>
+      <section class="card" id="prediction" hidden><h3 id="predictionLabel"></h3><progress id="probability" max="1"></progress><p id="probabilityText"></p><p id="explanation"></p></section>
+      <section class="card" id="whatIfCard" hidden><h3>What-if 模擬</h3><table><thead><tr><th>條件</th><th>原始機率</th><th>改變後</th><th>差異</th></tr></thead><tbody id="whatIf"></tbody></table></section>
+      <section class="card"><h3>特徵重要性</h3><div id="importance" class="muted">需要先啟用模型</div></section>
+    {% elif page == 'batch' %}
+      <h2>Batch prediction</h2><section class="card"><p class="muted">必要欄位：Pclass, Sex, Age, SibSp, Parch, Fare, Embarked</p>
+      <form id="batchForm"><label for="csv">CSV 檔案</label><input id="csv" name="file" type="file" accept=".csv,text/csv" required><button id="batchButton">預測並下載 CSV</button></form></section>
+      <section class="card" id="previewCard" hidden><h3>結果預覽（前 10 筆）</h3><table id="preview"></table></section>
+    {% endif %}
+  </main>
+  <script>
+    const page = {{ page|tojson }};
+    const message = document.getElementById('message');
+    const showMessage = (text, error=false) => { message.hidden=false; message.textContent=text; message.className=`status ${error?'error':''}`; };
+    const api = async (url, options={}) => { const response=await fetch(url,options); if(!response.ok){ let data={}; try{data=await response.json()}catch{} throw new Error(data.error||`HTTP ${response.status}`) } return response; };
+    const percent = value => `${(Number(value)*100).toFixed(1)}%`;
+    const escapeHtml = value => String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+
+    async function loadDashboard(){
+      const [dataResponse,modelsResponse,trainingResponse]=await Promise.all([api('/api/ml/dashboard'),api('/api/ml/models'),api('/api/ml/train/status')]);
+      const data=await dataResponse.json(), models=await modelsResponse.json(), training=await trainingResponse.json();
+      const active=models.items.find(item=>item.active), missingTotal=Object.values(data.missing_values).reduce((sum,value)=>sum+value,0), modelName=active?active.model_name.split('_').map(word=>word[0].toUpperCase()+word.slice(1)).join(' '):'No Active Model';
+      [['kpiTotal',data.total],['kpiSurvival',percent(data.survival_rate)],['kpiMissing',missingTotal],['kpiModel',modelName]].forEach(([id,value])=>{const element=document.getElementById(id);element.textContent=value;element.classList.remove('skeleton','skeleton-value')});
+      document.getElementById('kpiModelNote').textContent=active?`Version ${active.version}`:'Train a model to enable prediction';
+      document.getElementById('datasetBadge').textContent=data.total?'Dataset Ready':'Dataset Empty'; document.getElementById('serviceBadge').textContent='Model Service Online'; document.getElementById('trainingMini').textContent=`Training status: ${training.status}`;
+
+      const qualityRows=Object.entries(data.missing_values).map(([name,count])=>{const ratio=data.total?count/data.total:0,status=ratio===0?['Good','good']:ratio<=.2?['Warning','warning']:['Needs Attention','attention'];return `<tr><td><strong>${escapeHtml(name)}</strong></td><td>${count}</td><td>${percent(ratio)}</td><td><div class="quality-track"><div class="quality-fill" style="width:${Math.min(ratio*100,100)}%"></div></div></td><td><span class="tag ${status[1]}">${status[0]}</span></td></tr>`}).join('');
+      document.getElementById('qualityBody').innerHTML=qualityRows; const qualitySummary=document.getElementById('qualitySummary'); qualitySummary.textContent=`${missingTotal} missing cells`; qualitySummary.className=`tag ${missingTotal?'warning':'good'}`;
+
+      document.getElementById('survivedCount').textContent=data.survived.toLocaleString(); document.getElementById('notSurvivedCount').textContent=data.not_survived.toLocaleString(); document.getElementById('survivalBar').style.width=percent(data.survival_rate); document.getElementById('survivalRateText').textContent=`Survived ${percent(data.survival_rate)}`; document.getElementById('lostRateText').textContent=`Not survived ${percent(1-data.survival_rate)}`;
+      const featureDetails={Pclass:`${Object.keys(data.overview.pclass).length} passenger classes`,Sex:`${Object.keys(data.overview.sex).length} categories`,Age:`Average ${data.overview.average_age} years`,Fare:`Average $${data.overview.average_fare}`,Embarked:`${Object.keys(data.overview.embarked).filter(key=>key!=='Unknown').length} departure ports`,SibSp:'Family aboard count',Parch:'Parent / child count'};
+      Object.entries(featureDetails).forEach(([name,value])=>document.getElementById(`feature${name}`).textContent=value);
+
+      const steps=[['Load Data','Completed'],['Clean Features','Ready'],['Train Model',active?'Completed':'Pending'],['Save Model',active?'Completed':'Pending'],['Predict',active?'Ready':'Not Started']];
+      document.getElementById('workflow').innerHTML=steps.map(([name,status],index)=>`<article class="workflow-step"><div class="step-number">0${index+1}</div><h3>${name}</h3><span class="tag ${status==='Completed'||status==='Ready'?'good':status==='Pending'?'warning':'attention'}">${status}</span></article>`).join(''); document.getElementById('workflowLabel').textContent=active?'Pipeline ready for prediction':'Model training required';
+    }
+    function renderTraining(state){
+      document.getElementById('trainStatus').textContent=state.status+(state.error?`\n${state.error}`:'');
+      document.getElementById('trainButton').disabled=state.status==='training';
+      if(state.result) document.getElementById('trainResult').innerHTML=`<h3>${state.result.model_name}</h3>${state.result.reused?'<p class="badge">Equivalent model reused — no duplicate file created</p>':''}<p>最佳參數：<code>${JSON.stringify(state.result.best_params)}</code></p><p>Accuracy ${percent(state.result.metrics.accuracy)} · Precision ${percent(state.result.metrics.precision)} · Recall ${percent(state.result.metrics.recall)} · F1 ${percent(state.result.metrics.f1)} · ROC-AUC ${percent(state.result.metrics.roc_auc)}</p><p>${state.result.reused?'Existing artifact':'耗時 '+state.result.training_seconds+'s'} · ${state.result.model_path}</p>`;
+    }
+    async function pollTraining(){ const state=await (await api('/api/ml/train/status')).json(); renderTraining(state); if(state.status==='training') setTimeout(pollTraining,1000); }
+    async function loadModels(){
+      const data=await (await api('/api/ml/models')).json();
+      const groups=new Map();
+      for(const item of data.items){const signature=JSON.stringify([item.model_name,item.search_mode,item.best_params,item.metrics,item.feature_columns,item.preprocessing_info]),previous=groups.get(signature);if(!previous){groups.set(signature,{...item,run_count:1});continue}groups.set(signature,{...(item.active?item:previous),run_count:previous.run_count+1,active:previous.active||item.active,champion:previous.champion||item.champion})}
+      const items=[...groups.values()],best=items.length?Math.max(...items.map(item=>item.metrics.accuracy)):0;
+      document.getElementById('runCount').textContent=data.items.length; document.getElementById('uniqueCount').textContent=items.length; document.getElementById('bestAccuracy').textContent=percent(best); document.getElementById('registryCount').textContent=`${items.length} unique · ${data.items.length} saved`;
+      document.getElementById('models').innerHTML=items.map(item=>{const algorithm=item.model_name.split('_').map(word=>word[0].toUpperCase()+word.slice(1)).join(' '),parameters=Object.entries(item.best_params).map(([key,value])=>`<span class="param-chip">${escapeHtml(key.replace('model__',''))}=${escapeHtml(value)}</span>`).join('');return `<tr class="${item.active?'active-run':''}"><td>${item.active?'<span class="model-badge active">Active</span>':''}${item.champion?'<span class="model-badge champion">Champion</span>':''}${item.run_count>1?`<span class="model-badge runs">×${item.run_count} equivalent runs</span>`:''}</td><td><div class="run-id">${escapeHtml(item.version)}</div><div class="run-time">${new Date(item.created_at).toLocaleString('zh-TW',{hour12:false})}</div></td><td><div class="algorithm-name">${escapeHtml(algorithm)}</div><div class="algorithm-mode">${escapeHtml(item.search_mode)} search</div></td><td><span class="metric-number ${item.metrics.accuracy===best?'best':''}">${percent(item.metrics.accuracy)}</span></td><td><span class="metric-number">${percent(item.metrics.f1)}</span></td><td><span class="metric-number">${percent(item.metrics.roc_auc)}</span></td><td><div class="param-list">${parameters}</div></td><td><button class="activate-button" onclick="activate('${item.version}')" ${item.active?'disabled':''}>${item.active?'In use':'Promote'}</button></td></tr>`}).join('')||'<tr><td colspan="8">No trained models yet. Run your first experiment.</td></tr>';
+    }
+    async function activate(version){ try{await api('/api/ml/models/use',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({version})}); loadModels()}catch(error){showMessage(error.message,true)} }
+    const passengerData = () => Object.fromEntries(new FormData(document.getElementById('predictForm')).entries());
+    async function loadImportance(){ try{const data=await (await api('/api/ml/feature-importance')).json(); document.getElementById('importance').innerHTML=data.items.slice(0,10).map(x=>`<div>${x.feature}: ${x.importance}</div>`).join('')||'此模型未提供特徵重要性'}catch(error){document.getElementById('importance').textContent=error.message} }
+
+    if(page==='dashboard') loadDashboard().catch(error=>{showMessage(`Dashboard 載入失敗：${error.message}`,true);['kpiTotal','kpiSurvival','kpiMissing','kpiModel'].forEach(id=>{const element=document.getElementById(id);element.textContent='Unavailable';element.classList.remove('skeleton','skeleton-value')});document.getElementById('datasetBadge').textContent='Dataset Unavailable';document.getElementById('serviceBadge').textContent='Model Service Unavailable'});
+    if(page==='train'){
+      pollTraining().catch(error=>showMessage(error.message,true));
+      document.getElementById('trainForm').addEventListener('submit',async event=>{event.preventDefault(); try{await api('/api/ml/train',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model_name:document.getElementById('model').value,search_mode:document.getElementById('mode').value})}); pollTraining()}catch(error){showMessage(error.message,true)}});
+    }
+    if(page==='models') loadModels().catch(error=>showMessage(error.message,true));
+    if(page==='predict'){
+      loadImportance();
+      document.getElementById('predictForm').addEventListener('submit',async event=>{event.preventDefault(); const button=document.getElementById('predictButton'); button.disabled=true; try{
+        const body=JSON.stringify(passengerData()); const [prediction,whatIf]=await Promise.all([api('/api/ml/predict',{method:'POST',headers:{'Content-Type':'application/json'},body}),api('/api/ml/predict/what-if',{method:'POST',headers:{'Content-Type':'application/json'},body})]);
+        const result=await prediction.json(), simulations=await whatIf.json(); document.getElementById('prediction').hidden=false; document.getElementById('whatIfCard').hidden=false; document.getElementById('predictionLabel').textContent=`${result.prediction_label} · ${result.risk_level} risk · ${result.model_name}`; document.getElementById('probability').value=result.survival_probability; document.getElementById('probabilityText').textContent=`生存機率 ${percent(result.survival_probability)} · 模型 ${result.model_version}`; document.getElementById('explanation').textContent=result.explanation;
+        document.getElementById('whatIf').innerHTML=simulations.items.map(x=>`<tr><td>${x.condition}</td><td>${percent(x.original)}</td><td>${percent(x.changed)}</td><td>${x.difference>=0?'+':''}${percent(x.difference)}</td></tr>`).join('');
+      }catch(error){showMessage(error.message,true)}finally{button.disabled=false}});
+    }
+    if(page==='batch') document.getElementById('batchForm').addEventListener('submit',async event=>{event.preventDefault(); const button=document.getElementById('batchButton'); button.disabled=true; try{
+      const response=await api('/api/ml/predict/csv',{method:'POST',body:new FormData(event.target)}), blob=await response.blob(), text=await blob.text(), rows=text.trim().split(/\r?\n/).slice(0,11); document.getElementById('previewCard').hidden=false; document.getElementById('preview').innerHTML=rows.map((row,index)=>`<tr>${row.split(',').map(cell=>`<${index?'td':'th'}>${escapeHtml(cell)}</${index?'td':'th'}>`).join('')}</tr>`).join(''); const link=document.createElement('a'); link.href=URL.createObjectURL(blob); link.download='titanic_predictions.csv'; link.click(); URL.revokeObjectURL(link.href);
+    }catch(error){showMessage(error.message,true)}finally{button.disabled=false}});
+  </script>
+</body>
+</html>
