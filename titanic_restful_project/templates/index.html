@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Titanic 乘客資料管理</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 30px;
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .toolbar {
+            margin-bottom: 20px;
+        }
+
+        .toolbar input,
+        .toolbar button {
+            padding: 6px;
+            margin-right: 6px;
+        }
+
+        a {
+            text-decoration: none;
+            color: blue;
+        }
+
+        .pagination {
+            margin-top: 20px;
+        }
+    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='wandb-theme.css') }}">
+</head>
+
+<body class="crud-theme">
+    {% include '_main_nav.html' %}
+    <h1>Titanic 乘客資料管理</h1>
+
+    <div class="toolbar">
+        <a href="/passengers/new">新增乘客</a>
+        <br><br>
+
+        <input type="text" id="searchInput" placeholder="搜尋姓名">
+
+        <button onclick="loadPassengers(1)">查詢</button>
+    </div>
+
+    <div id="summary"></div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>姓名</th>
+                <th>性別</th>
+                <th>年齡</th>
+                <th>艙等</th>
+                <th>是否生還</th>
+                <th>票價</th>
+                <th>登船港口</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="passengerTableBody"></tbody>
+    </table>
+
+    <div class="pagination">
+        <button onclick="prevPage()">上一頁</button>
+        <span id="pageInfo"></span>
+        <button onclick="nextPage()">下一頁</button>
+    </div>
+
+    <script>
+        // 定義全域變數 currentPage、perPage 和 total，
+        // 分別用來記錄目前的頁碼、每頁顯示的資料筆數，以及資料的總筆數。
+        let currentPage = 1;
+        const perPage = 20;
+        let total = 0;
+
+        // 定義一個名為 loadPassengers 的非同步函式，接受一個 page 參數，預設值為 1。
+        async function loadPassengers(page = 1) {
+            // 取得目前的頁碼，並把它存到 currentPage 變數中。
+            currentPage = page;
+
+            // 取得搜尋輸入框的值，存到 search 變數中。
+            const search = document.getElementById("searchInput").value;
+
+            // 使用 URLSearchParams 來建立查詢字串，包含 page、per_page 和 search 三個參數。
+            // 這裡的查詢字串就是 Query String，會被附加在 URL 的後面，傳遞給後端 API。
+            const params = new URLSearchParams({
+                page: currentPage,
+                per_page: perPage,
+                search: search
+            });
+
+            // 使用 fetch API 來向後端 API 發送 GET 請求，URL 包含剛剛建立的查詢字串
+            const response = await fetch(`/api/passengers?${params.toString()}`);
+
+            // 當你需要更精確的錯誤訊息時，再加上 response.status 判斷即可，
+            // 目前可以使用 response.ok 來判斷是否成功讀取資料，
+            // 它通常會回傳 true 或 false，根據 HTTP 狀態碼來判斷是否成功，
+            // HTTP status code 200-299 代表成功，其他則代表失敗。
+            if (!response.ok) {
+                alert("讀取資料失敗");
+                return;
+            }
+
+            // 如果成功讀取資料，我們就把回傳的 JSON 格式資料解析出來，存到 data 變數中
+            const data = await response.json();
+
+            // 把 data 中的 total 屬性存到全域變數 total 中，得知資料的總筆數
+            total = data.total;
+
+            // 把資料顯示在表格
+            renderTable(data.items);
+
+            // 更新分頁資訊
+            renderPagination(data.page, data.per_page, data.total);
+        }
+
+        // 定義一個名為 renderTable 的函式，接受一個 items 參數，
+        // 這個參數是一個陣列，包含了要顯示在表格中的資料
+        function renderTable(items) {
+            const tbody = document.getElementById("passengerTableBody");
+            tbody.innerHTML = "";
+
+            for (const item of items) {
+                const tr = document.createElement("tr");
+
+                tr.innerHTML = `
+                    <td>${item.PassengerId}</td>
+                    <td>${item.Name}</td>
+                    <td>${item.Sex}</td>
+                    <td>${item.Age ?? ""}</td>
+                    <td>${item.Pclass}</td>
+                    <td>${item.Survived === 1 ? "生還" : "未生還"}</td>
+                    <td>${item.Fare}</td>
+                    <td>${item.Embarked ?? ""}</td>
+                    <td>
+                        <a href="/passengers/${item.PassengerId}/edit">編輯</a>
+                        |
+                        <button onclick="deletePassenger(${item.PassengerId})">刪除</button>
+                    </td>
+                `;
+
+                tbody.appendChild(tr);
+            }
+        }
+
+        // 顯示分頁資訊
+        function renderPagination(page, perPage, total) {
+            const totalPages = Math.ceil(total / perPage);
+
+            document.getElementById("summary").textContent =
+                `共有 ${total} 筆資料`;
+
+            document.getElementById("pageInfo").textContent =
+                `第 ${page} 頁 / 共 ${totalPages} 頁`;
+        }
+
+        // 當使用者點擊「上一頁」按鈕時，會呼叫這個函式。
+        // 這個函式會檢查目前的頁碼是否大於 1，
+        // 如果是，就呼叫 loadPassengers 函式，載入前一頁的資料。
+        function prevPage() {
+            if (currentPage > 1) {
+                loadPassengers(currentPage - 1);
+            }
+        }
+
+        // 當使用者點擊「下一頁」按鈕時，會呼叫這個函式。
+        // 這個函式會先計算總頁數，然後檢查目前的頁碼是否小於總頁數，
+        // 如果是，就呼叫 loadPassengers 函式，載入下一頁的資料。
+        function nextPage() {
+            const totalPages = Math.ceil(total / perPage);
+
+            if (currentPage < totalPages) {
+                loadPassengers(currentPage + 1);
+            }
+        }
+
+        // 刪除的乘客 (透過 passengerId)。
+        async function deletePassenger(passengerId) {
+            // 在刪除之前，先顯示一個確認對話框，詢問使用者是否確定要刪除這筆資料
+            const confirmed = confirm(`確定要刪除 PassengerId=${passengerId} 嗎？`);
+
+            // 如果使用者點擊「取消」，就直接回傳，不執行刪除操作
+            if (!confirmed) {
+                return;
+            }
+        
+            // 請求刪除乘客
+            const response = await fetch(`/api/passengers/${passengerId}`, {
+                method: "DELETE"
+            });
+
+            // 取得回傳的 JSON 格式資料，存到 result 變數中
+            const result = await response.json()
+
+            // 如果刪除失敗，會回傳一個 error 屬性，顯示錯誤訊息給使用者
+            if (!response.ok) {
+                alert(result.error || "刪除失敗");
+                return;
+            }
+
+            alert("刪除成功");
+
+            // 刪除成功後，重新載入目前頁碼的資料，使用者可以看到最新的資料列表
+            loadPassengers(currentPage);
+        }
+
+        // 頁面載入完成後，會自動載入第一頁的資料
+        loadPassengers();
+    </script>
+</body>
+
+</html>

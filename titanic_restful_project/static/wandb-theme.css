@@ -1,0 +1,351 @@
+:root {
+  color-scheme: dark;
+  --wb-bg: #1b1c1f;
+  --wb-panel: #24262b;
+  --wb-panel-soft: #2c2e33;
+  --wb-line: #3a3c42;
+  --wb-yellow: #ffbf3f;
+  --wb-cream: #f7f3e9;
+  --wb-muted: #aaa9a4;
+  --wb-cyan: #6de0e8;
+}
+
+body,
+button,
+input,
+select,
+textarea {
+  font-family: Consolas, "Microsoft JhengHei", monospace;
+}
+
+body.wandb-theme,
+body.crud-theme {
+  color: var(--wb-cream);
+  background: var(--wb-bg);
+}
+
+body.wandb-theme nav {
+  background: #1b1c1ff2;
+  border-color: var(--wb-line);
+}
+
+body.wandb-theme nav a.active,
+body.wandb-theme nav a:hover {
+  color: #1b1c1f;
+  background: var(--wb-yellow);
+}
+
+.app-nav {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 22px;
+  width: 100%;
+  padding: 11px max(18px, 4vw);
+  overflow: visible;
+  border: 1px solid var(--wb-line);
+  border-width: 0 0 1px;
+  background: #1b1c1ff2;
+  backdrop-filter: blur(14px);
+}
+
+.app-nav .app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--wb-cream);
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-nav .app-brand span {
+  color: var(--wb-yellow);
+}
+
+.app-nav-links {
+  display: flex;
+  gap: 5px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.app-nav-links::-webkit-scrollbar {
+  display: none;
+}
+
+.app-nav .app-nav-links a {
+  padding: 9px 11px;
+  color: var(--wb-muted);
+  border-radius: 8px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.app-nav .app-nav-links a:hover,
+.app-nav .app-nav-links a.active {
+  color: #1b1c1f;
+  background: var(--wb-yellow);
+}
+
+body.crud-theme .app-nav {
+  margin: -20px 0 38px;
+  border-width: 1px;
+  border-radius: 12px;
+}
+
+body.wandb-theme header h1,
+body.wandb-theme h1,
+body.wandb-theme h2,
+body.wandb-theme h3,
+body.wandb-theme .registry-hero h1 {
+  font-family: Consolas, "Microsoft JhengHei", monospace;
+}
+
+body.wandb-theme .card,
+body.wandb-theme .dashboard-panel,
+body.wandb-theme .kpi-card,
+body.wandb-theme .feature-card,
+body.wandb-theme .workflow-step {
+  color: var(--wb-cream);
+  border-color: var(--wb-line);
+  border-radius: 8px;
+  background: var(--wb-panel);
+  box-shadow: none;
+}
+
+body.wandb-theme .dashboard-hero {
+  padding: 32px;
+  border-color: var(--wb-line);
+  border-radius: 8px;
+  background: var(--wb-panel);
+  box-shadow: none;
+}
+
+body.wandb-theme .dashboard-hero::after {
+  display: none;
+}
+
+body.wandb-theme .dashboard-hero h1,
+body.wandb-theme .registry-hero h1 {
+  font-size: clamp(2rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -.025em;
+}
+
+body.wandb-theme .hero-status,
+body.wandb-theme .survival-stat {
+  border-color: var(--wb-line);
+  background: #1d1f23d9;
+}
+
+body.wandb-theme .eyebrow,
+body.wandb-theme .registry-eyebrow,
+body.wandb-theme .metric,
+body.wandb-theme .step-number {
+  color: var(--wb-yellow);
+}
+
+body.wandb-theme .step-number {
+  color: var(--wb-yellow);
+  background: #ffbf3f17;
+}
+
+body.wandb-theme .btn-link,
+body.wandb-theme button,
+body.wandb-theme .registry-action {
+  color: #1b1c1f;
+  background: var(--wb-yellow);
+  border-radius: 4px;
+}
+
+body.wandb-theme .btn-link.secondary {
+  color: var(--wb-cream);
+  border-color: var(--wb-line);
+  background: #ffffff0a;
+}
+
+body.wandb-theme input,
+body.wandb-theme select {
+  color: var(--wb-cream);
+  border-color: var(--wb-line);
+  background: #202226;
+}
+
+body.wandb-theme table th {
+  color: #92938e;
+}
+
+body.wandb-theme table tbody tr:hover {
+  background: #ffffff08;
+}
+
+body.wandb-theme .quality-track,
+body.wandb-theme .survival-track {
+  background: #3a3c42;
+}
+
+body.wandb-theme .quality-fill,
+body.wandb-theme .survived-bar {
+  background: linear-gradient(90deg, var(--wb-yellow), #ffd878);
+}
+
+body.wandb-theme progress {
+  accent-color: var(--wb-yellow);
+}
+
+body.wandb-theme .kpi-card,
+body.wandb-theme .workflow-step {
+  min-height: 0;
+}
+
+body.wandb-theme .kpi-card:hover,
+body.wandb-theme .btn-link:hover {
+  transform: none;
+}
+
+body.wandb-theme .registry-stat,
+body.wandb-theme .registry-stat.accent,
+body.wandb-theme .registry-panel {
+  border-radius: 8px;
+  background: var(--wb-panel);
+  box-shadow: none;
+}
+
+body.crud-theme {
+  min-height: 100vh;
+  margin: 0;
+  padding: 44px max(24px, 6vw) 70px;
+  background: var(--wb-bg);
+}
+
+body.crud-theme h1 {
+  margin: 0 0 28px;
+  color: var(--wb-cream);
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  letter-spacing: -.045em;
+}
+
+body.crud-theme h1::before {
+  content: "DATASET";
+  display: block;
+  margin-bottom: 9px;
+  color: var(--wb-yellow);
+  font-size: .72rem;
+  letter-spacing: .16em;
+}
+
+body.crud-theme .toolbar,
+body.crud-theme form,
+body.crud-theme table,
+body.crud-theme #summary {
+  border: 1px solid var(--wb-line);
+  border-radius: 8px;
+  background: var(--wb-panel);
+  box-shadow: none;
+}
+
+body.crud-theme .toolbar,
+body.crud-theme form {
+  max-width: 760px;
+  padding: 22px;
+}
+
+body.crud-theme #summary {
+  display: inline-block;
+  margin: 18px 0 0;
+  padding: 9px 13px;
+  color: var(--wb-yellow);
+}
+
+body.crud-theme table {
+  display: block;
+  overflow-x: auto;
+  width: 100%;
+  padding: 14px;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+body.crud-theme th {
+  color: #92938e;
+  background: #1e2024;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+body.crud-theme th,
+body.crud-theme td {
+  border-color: var(--wb-line);
+}
+
+body.crud-theme tbody tr:hover {
+  background: #ffffff08;
+}
+
+body.crud-theme label {
+  color: var(--wb-muted);
+  font-size: .8rem;
+  font-weight: 700;
+  letter-spacing: .05em;
+}
+
+body.crud-theme input,
+body.crud-theme select {
+  width: min(100%, 520px);
+  color: var(--wb-cream);
+  border: 1px solid var(--wb-line);
+  background: #202226;
+}
+
+body.crud-theme button,
+body.crud-theme a {
+  border-radius: 8px;
+}
+
+body.crud-theme button {
+  color: #1b1c1f;
+  border: 0;
+  background: var(--wb-yellow);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+body.crud-theme a {
+  color: var(--wb-yellow);
+}
+
+body.crud-theme .pagination {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+@media (max-width: 620px) {
+  .app-nav {
+    gap: 10px;
+    padding-inline: 12px;
+  }
+
+  .app-nav .app-brand {
+    font-size: 0;
+  }
+
+  .app-nav .app-brand span {
+    font-size: .8rem;
+  }
+
+  body.crud-theme {
+    padding: 28px 16px 50px;
+  }
+
+  body.crud-theme .toolbar,
+  body.crud-theme form {
+    padding: 17px;
+  }
+}

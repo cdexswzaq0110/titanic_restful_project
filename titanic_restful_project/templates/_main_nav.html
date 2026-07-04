@@ -1,0 +1,9 @@
+{% set current_page = page|default('data') %}
+<nav class="app-nav" aria-label="主要導覽">
+  <a class="app-brand" href="/">TITANIC</a>
+  <div class="app-nav-links">
+    {% for route, href, label in [('data','/','Titanic Data'),('dashboard','/ml/dashboard','Dashboard'),('train','/ml/train','Train'),('models','/ml/models','Models'),('predict','/ml/predict','Predict'),('batch','/ml/batch','Batch')] %}
+      <a href="{{ href }}" class="{{ 'active' if current_page == route else '' }}">{{ label }}</a>
+    {% endfor %}
+  </div>
+</nav>

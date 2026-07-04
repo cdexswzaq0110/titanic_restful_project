@@ -1,0 +1,41 @@
+{
+  "version": "20260701_150642_415255",
+  "model_name": "gradient_boosting",
+  "model_path": "models\\titanic_model_20260701_150642_415255.joblib",
+  "metadata_path": "models\\titanic_model_20260701_150642_415255.json",
+  "created_at": "2026-07-01T15:06:42",
+  "search_mode": "quick",
+  "best_params": {
+    "model__learning_rate": 0.1,
+    "model__max_depth": 3,
+    "model__n_estimators": 100
+  },
+  "metrics": {
+    "accuracy": 0.7989,
+    "precision": 0.7895,
+    "recall": 0.6522,
+    "f1": 0.7143,
+    "roc_auc": 0.8181,
+    "confusion_matrix": [
+      [
+        98,
+        12
+      ],
+      [
+        24,
+        45
+      ]
+    ]
+  },
+  "training_seconds": 1.28,
+  "feature_columns": [
+    "Pclass",
+    "Sex",
+    "Age",
+    "SibSp",
+    "Parch",
+    "Fare",
+    "Embarked"
+  ],
+  "preprocessing_info": "Median imputation, most-frequent categorical imputation, one-hot encoding, numeric scaling"
+}
