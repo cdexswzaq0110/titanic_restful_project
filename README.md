@@ -57,14 +57,58 @@ restful_api_ajax-master/
 - scikit-learn==1.8.0
 - joblib==1.5.3
 
+請先確認目前位置在專案根目錄：
+
+```text
+restful_api_ajax-master/
+```
+
+### Windows PowerShell
+
+```powershell
+python -m venv .venv
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+```
+
+若 PowerShell 出現 `PSSecurityException`，或顯示「因為這個系統上已停用指令碼執行，所以無法載入 Activate.ps1」，請先執行：
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+再重新啟動虛擬環境：
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+`-Scope Process` 只會影響目前這個 PowerShell 視窗，關閉終端機後會恢復原本設定。
+
+### Windows CMD
+
+```cmd
+python -m venv .venv
+.venv\Scripts\activate.bat
+python -m pip install -r requirements.txt
+```
+
+### Git Bash
+
 ```bash
-# Linux / WSL
+python -m venv .venv
+source .venv/Scripts/activate
+python -m pip install -r requirements.txt
+```
+
+### Linux / WSL / macOS
+
+```bash
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
 ```
-
-Windows 可將啟用指令改為 `.venv\Scripts\activate`。
 
 ## 執行方法
 
@@ -179,7 +223,3 @@ python -m unittest -v test_ml.py
 
 [Titanic ML 專案展示影片](YOUR_VIDEO_URL)
 
-## 安裝套件
-```bash
-pip install -r requirements.txt
-```
