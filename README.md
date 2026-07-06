@@ -221,5 +221,5 @@ python -m unittest -v test_ml.py
 
 ### 展示影片
 
-[Titanic ML 專案展示影片](YOUR_VIDEO_URL)
+[Titanic ML 專案展示影片](https://www.youtube.com/watch?v=-Dcp0Dqo8TU&feature=youtu.be)
 
