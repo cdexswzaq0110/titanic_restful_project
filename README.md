@@ -130,8 +130,6 @@ python app.py
 | Extra Trees | `n_estimators=200`, `max_depth=8`, `min_samples_leaf=2` | 80.45% | 70.09% | **84.90%** |
 | SVM | `C=1`, `kernel=rbf`, `gamma=scale` | **81.56%** | **73.60%** | 84.01% |
 
-「理想超參數」不是所有資料都固定相同；上表只代表目前資料切分與搜尋範圍下的最佳組合。目前 SVM 的測試集 Accuracy 最高，Extra Trees 的 ROC-AUC 最高。系統不使用訓練集分數冒充測試集結果，因此沒有宣稱不實的 90%～100% Accuracy。
-
 ### 搜尋模式與模型版本
 
 - `quick`：最少組合，適合展示與快速驗證流程
