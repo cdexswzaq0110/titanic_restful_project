@@ -1,5 +1,11 @@
 # 使用 Restful API 與 Ajax 來進行機器學習模型訓練與預測
-
+<p align="center">
+  <img
+    src="./titanic-ml-control-tower.png"
+    alt="titanic-ml-control-tower"
+    width="100%"
+  />
+</p>
 ## 專案介紹
 
 本專案基於 Titanic RESTful API + Ajax CRUD 作業擴充為 **Titanic ML Control Tower**。原有乘客資料 CRUD 保留，新增資料概覽、模型訓練、版本管理、單筆預測、What-if 模擬、CSV 批次預測與特徵重要性。
